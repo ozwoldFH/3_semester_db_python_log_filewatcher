@@ -34,7 +34,6 @@ def closeDatabaseConnectionAndExitScript():
   mydb.close
   sys.exit(0)
 
-
 def getTodaysLogFileName():
   return time.strftime("%Y%m%d") + ".txt"
 
@@ -60,7 +59,6 @@ def getLatestDatetimeFromDB():
       return cursor.fetchone()
   except Exception as e:
     print('error while db operation:', e)
-    mydb.rollback()
 
 
 # ------------------------------------------------------------------------
@@ -71,7 +69,7 @@ if doesFileExists(locationToWatch, logFileName) == False:
   onErrorWriteDB("file not found")
   closeDatabaseConnectionAndExitScript()
 lastDatetime = getLatestDatetimeFromDB()
-print(lastDatetime)
+
 
 
 
