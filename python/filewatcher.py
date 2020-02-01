@@ -20,8 +20,10 @@ user="user_logger"
 passwd="kW^!TccDnRU@&6*%^@iW$aBDdJrTXe8#%HnA8mQx@3FdjBf&Jep4z6RBKanN35TU"
 selectedDatabase="db_logs"
 locationToWatch=Path("testfolder/folderWithLogs/")
-logFileName="log.txt"
+logFileName="log.log"
 nDaysToRemoveFiles = 2
+logDelimiter=";"
+logEndWith=".log"
 
 
 # ------------------------------------------------------------------------
@@ -49,10 +51,10 @@ def closeDatabaseConnectionAndExitScript():
   sys.exit(0)
 
 def getYesterdaysLogFileName():
-  return (datetime.now() - timedelta(days=1)).strftime("%Y%m%d") + ".txt"
+  return (datetime.now() - timedelta(days=1)).strftime("%Y%m%d") + logEndWith
 
 def getTodaysLogFileName():
-  return datetime.now().strftime("%Y%m%d") + ".txt"
+  return datetime.now().strftime("%Y%m%d") + logEndWith
 
 def doesFileExists(locationPath, filename):
   return Path.exists(locationPath / filename)
@@ -91,23 +93,28 @@ def onSuccessWriteDB(logLineObject: LogLine):
 def readFileAndWriteDBforEachLine(lastDatetime):
   try:
     with open(locationToWatch / logFileName) as f:
-      for line in csv.reader(f, delimiter="\t"):
-        log_datetime = datetime.strptime(line[0], '%Y-%m-%d %H:%M:%S')
-
+      for line in csv.reader(f, delimiter=logDelimiter):
+        log_datetime = datetime.strptime(line[0], '%Y-%m-%d %H:%M:%S.%f')
         if(log_datetime <= lastDatetime):
+          print("log: " + str(log_datetime) + "last: " + str(lastDatetime))
           continue
-        logLineObject = LogLine(log_datetime, line[1], line[2], line[3], line[4])
+        
+        # hotfix
+        emptyArray = [''] * 10
+        for i in range(len(line)):
+          emptyArray[i] = line[i]
+
+        logLineObject = LogLine(log_datetime, emptyArray[1], emptyArray[2], emptyArray[3], emptyArray[4])
         onSuccessWriteDB(logLineObject)
         #print(logLineObject.log_datetime, logLineObject.pc_name, logLineObject.name, logLineObject.a, logLineObject.b)
   except Exception as e:
     onErrorWriteDB("error while reading: " + str(e))
 
-def removeTxtFilesOlderNDays(n):
+def removeLogFilesOlderNDays(n):
   # remove files which are older than n days
   old_time = datetime.now() - timedelta(days=n)
-  print(locationToWatch)
   for f in os.scandir(locationToWatch):
-    if f.name.endswith(".txt"):
+    if f.name.endswith(logEndWith):
       creation_time = datetime.fromtimestamp(os.path.getctime(f))
       if (creation_time < old_time):
           os.unlink(f)
@@ -129,7 +136,7 @@ if doesFileExists(locationToWatch, logFileName) == False:
   closeDatabaseConnectionAndExitScript()
 lastDatetime = getLatestDatetimeFromDB()[0]
 readFileAndWriteDBforEachLine(lastDatetime)
-# 4. remove old log files (*.txt)
-removeTxtFilesOlderNDays(nDaysToRemoveFiles)
+# 4. remove old log files 
+removeLogFilesOlderNDays(nDaysToRemoveFiles)
 # 5. close connection
 closeDatabaseConnectionAndExitScript()
