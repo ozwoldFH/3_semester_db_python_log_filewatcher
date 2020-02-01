@@ -33,14 +33,14 @@ INSERT INTO T_OnError (message)
 	VALUES('init_db');
 	
 -- add stored procedure
-DROP procedure IF EXISTS P_getLatestDateFromSuccessOrError;
+DROP procedure IF EXISTS P_getLatestDatetimeFromSuccessOrError;
 DELIMITER //
-CREATE PROCEDURE P_getLatestDateFromSuccessOrError()
+CREATE PROCEDURE P_getLatestDatetimeFromSuccessOrError()
 BEGIN
-    SELECT MAX(lastDate) FROM (
-		SELECT log_datetime as lastDate FROM t_onsuccess WHERE id = (SELECT MAX(id) FROM t_onsuccess)
+    SELECT MAX(lastDatetime) FROM (
+		SELECT log_datetime as lastDatetime FROM t_onsuccess WHERE id = (SELECT MAX(id) FROM t_onsuccess)
 		UNION ALL
-		SELECT insert_datetime as lastDate FROM t_onerror WHERE id = (SELECT MAX(id) FROM t_onerror)
-	) as latestDateTable;
+		SELECT insert_datetime as lastDatetime FROM t_onerror WHERE id = (SELECT MAX(id) FROM t_onerror)
+	) as latestDatetimeTable;
 END //
 DELIMITER ;

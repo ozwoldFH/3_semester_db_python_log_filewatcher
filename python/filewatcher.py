@@ -44,13 +44,23 @@ def doesFileExists(locationPath, filename):
 def onErrorWriteDB(errorMessage="something went wrong"):
   try:
     data = (errorMessage)
-    sql = "INSERT INTO T_OnError (message) VALUES(%s)"
+    sql = "INSERT INTO T_OnError (message) VALUES(%s);"
     with mydb.cursor() as cursor:
-      e = cursor.execute(sql, data)
+      cursor.execute(sql, data)
       mydb.commit()
   except Exception as e:
     print('error while db operation:', e)
-    mydb.rollback() # if anything went wrong, rollback database
+    mydb.rollback()
+
+def getLatestDatetimeFromDB():
+  try:
+    sql = "CALL P_getLatestDatetimeFromSuccessOrError();"
+    with mydb.cursor() as cursor:
+      cursor.execute(sql)
+      return cursor.fetchone()
+  except Exception as e:
+    print('error while db operation:', e)
+    mydb.rollback()
 
 
 # ------------------------------------------------------------------------
@@ -60,7 +70,8 @@ logFileName = getTodaysLogFileName()
 if doesFileExists(locationToWatch, logFileName) == False:
   onErrorWriteDB("file not found")
   closeDatabaseConnectionAndExitScript()
-
+lastDatetime = getLatestDatetimeFromDB()
+print(lastDatetime)
 
 
 
