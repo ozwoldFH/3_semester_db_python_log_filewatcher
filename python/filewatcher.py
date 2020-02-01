@@ -28,13 +28,20 @@ def connectToDatabase():
     print('error while connection to db:', e)
 
 def getTodaysLogFileName():
-  return time.strftime("%Y%m%d")
+  return time.strftime("%Y%m%d") + ".txt"
+
+def doesFileExists():
+  print(Path.exists(locationToWatch / logName))
+  return Path.exists(locationToWatch / logName)
 
 # ------------------------------------------------------------------------
 # execution script
 mydb = connectToDatabase()
 logName = getTodaysLogFileName()
-
+if doesFileExists():
+  print("BINGO")
+else:
+  print("sad")
 
 
 
