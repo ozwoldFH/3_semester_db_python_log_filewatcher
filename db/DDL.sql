@@ -20,7 +20,6 @@ CREATE TABLE IF NOT EXISTS T_OnSuccess(
 
 CREATE TABLE IF NOT EXISTS T_OnError(
 	id INT AUTO_INCREMENT PRIMARY KEY,
-	log_datetime DATETIME,
 	insert_datetime DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	message VARCHAR(255) NOT NULL
 );
@@ -30,5 +29,5 @@ INSERT INTO T_OnSuccess (log_datetime, pc_name, name, a, b)
 	VALUES(NOW(), 'init_db', 'init_db', '-', '-');
 
 -- add inital data
-INSERT INTO T_OnError (log_datetime, message)
-	VALUES(NOW(), 'init_db');
+INSERT INTO T_OnError (message)
+	VALUES('init_db');
