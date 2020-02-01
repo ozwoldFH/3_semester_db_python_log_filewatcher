@@ -7,6 +7,7 @@
 # imports
 import pymysql
 from pathlib import Path
+import time
 
 
 # ------------------------------------------------------------------------
@@ -15,15 +16,28 @@ host="localhost"
 user="user_logger"
 passwd="kW^!TccDnRU@&6*%^@iW$aBDdJrTXe8#%HnA8mQx@3FdjBf&Jep4z6RBKanN35TU"
 locationToWatch=Path("testfolder/folderWithLogs/")
-
+logName="log.txt"
 
 # ------------------------------------------------------------------------
-# try to connect
-try:
-  mydb = pymysql.connect(host, user, passwd)
-  mydb.close
-except Exception as e:
-  print('error while connection to db:', e)
+# functions
+def connectToDatabase():
+  # try to connect
+  try:
+    return pymysql.connect(host, user, passwd)
+  except Exception as e:
+    print('error while connection to db:', e)
+
+def getTodaysLogFileName():
+  return time.strftime("%Y%m%d")
+
+# ------------------------------------------------------------------------
+# execution script
+mydb = connectToDatabase()
+logName = getTodaysLogFileName()
+
+
+
+
 
 
 
